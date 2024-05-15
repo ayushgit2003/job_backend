@@ -1,9 +1,10 @@
 const router = require("express").Router();
+const matchController = require("../controller/match_controller");
 const JobPostModel = require("../model/job_post.model");
 const JobPostService = require("../services/job_post.services");
 
 
-
+router.get("/recommend", matchController);
 router.get('/jobPosts', async (req, res) => {
     try {
         // Fetch all users from the database
