@@ -5,7 +5,7 @@ const JobPostService = require("../services/job_post.services");
 
 
 router.get("/recommend", matchController);
-router.get('/jobPosts', async (req, res) => {
+router.post('/jobPosts', async (req, res) => {
     try {
         // Fetch all users from the database
         const jobPosts = await JobPostModel.find();
