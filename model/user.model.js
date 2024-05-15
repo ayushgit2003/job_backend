@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const db = require("../config/db.js");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 
 const Schema = mongoose.Schema;
 // const { Schema } = mongoose;
@@ -43,21 +43,36 @@ const userSchema = new Schema({
 });
 
 
+// async function hashPassword(password) {
+// 	const salt = await bcrypt.genSalt(10);
+// 	return bcrypt.hash(password, salt);
+// }
+// // Middleware function to hash the password before saving
+// userSchema.pre("save", async function (next) {
+// 	try {
+// 		this.password = await hashPassword(this.password);
+// 		next();
+// 	} catch (error) {
+// 		next(error); // Pass the error to the next middleware/error handler
+// 		throw error;
+// 	}
+// });
 async function hashPassword(password) {
-	const salt = await bcrypt.genSalt(10);
-	return bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(password, salt);
 }
-// Middleware function to hash the password before saving
-userSchema.pre("save", async function (next) {
-	try {
-		this.password = await hashPassword(this.password);
-		next();
-	} catch (error) {
-		next(error); // Pass the error to the next middleware/error handler
-		throw error;
-	}
-});
 
+
+userSchema.pre("save", async function (next) {
+    try {
+        if (this.isModified('password') || this.isNew) {
+            this.password = await hashPassword(this.password);
+        }
+        next();
+    } catch (error) {
+        next(error); // Pass the error to the next middleware/error handler
+    }
+});
 userSchema.methods.comparePassword = async function (userPassword) {
 	try {
 		const isMatch = await bcrypt.compare(userPassword, this.password);
